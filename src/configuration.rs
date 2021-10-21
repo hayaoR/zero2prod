@@ -1,4 +1,4 @@
-use std::convert::{TryInto, TryFrom};
+use std::convert::{TryFrom, TryInto};
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -31,11 +31,11 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
     let environment: Environment = std::env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "local".into())
-        .try_into().
-        expect("Failed to parse APP_ENVIROMENT.");
+        .try_into()
+        .expect("Failed to parse APP_ENVIROMENT.");
 
     settings.merge(
-        config::File::from(configuraiton_directory.join(environment.as_str())).required(true)
+        config::File::from(configuraiton_directory.join(environment.as_str())).required(true),
     )?;
 
     settings.try_into()
@@ -43,7 +43,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
 pub enum Environment {
     Local,
-    Production
+    Production,
 }
 
 impl Environment {

@@ -1,5 +1,5 @@
-use actix_web::{web, HttpResponse};
 use crate::domain::{NewSubscriber, SubscriberName};
+use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -22,7 +22,7 @@ pub struct FormData {
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     let new_subscriber = NewSubscriber {
         email: form.0.email,
-        name: SubscriberName::parse(form.0.name),
+        name: SubscriberName::parse(form.0.name).expect("failed to parase"),
     };
     match insert_subscirber(&pool, &new_subscriber).await {
         Ok(_) => HttpResponse::Ok().finish(),
@@ -37,7 +37,10 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     name = "Saving new subscriber details in the database",
     skip(new_subscriber, pool)
 )]
-pub async fn insert_subscirber(pool: &PgPool, new_subscriber: &NewSubscriber) -> Result<(), sqlx::Error> {
+pub async fn insert_subscirber(
+    pool: &PgPool,
+    new_subscriber: &NewSubscriber,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
