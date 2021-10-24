@@ -1,10 +1,25 @@
 use std::convert::{TryFrom, TryInto};
+use crate::domain::SubscriberEmail;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub email_client: EmailClinetSettings,
 }
+
+#[derive(serde::Deserialize)]
+pub struct EmailClinetSettings {
+    pub base_url: String,
+    pub sender_email: String,
+}
+
+impl EmailClinetSettings {
+    pub fn sender(&self) -> Result<SubscriberEmail, String> {
+        SubscriberEmail::parse(self.sender_email.clone())
+    }
+}
+
 
 #[derive(serde::Deserialize)]
 pub struct ApplicationSettings {
